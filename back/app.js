@@ -2,9 +2,11 @@ const express  = require("express");
 const app = express();
 const morgan = require("morgan");
 require("dotenv").config();
+const path =require("path");
 const mongodb = require("./db/db");
 const bodyParser = require("body-parser");
-const routeUser = require("./route/user_route")
+const routeUser = require("./route/user_route");
+const routeSauce = require("./route/sauce_route");
 
 
 app.use(bodyParser.json())
@@ -20,6 +22,7 @@ app.use((req,res,next)=>{
 
 
 
-
+app.use("/images/", express.static(path.join(__dirname, "images")))
 app.use("/api/auth", routeUser)
+app.use("/api/sauces", routeSauce)
 module.exports = app;
