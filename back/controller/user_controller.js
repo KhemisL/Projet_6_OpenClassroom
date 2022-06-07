@@ -53,7 +53,7 @@ exports.login = (req,res)=>{
                         token: jwt.sign(
                             {userId: user._id},
                             process.env.KEY_TOKEN,
-                            {expiresIn: "12h"}
+                            {expiresIn: "24h"}
                         )
                     })
                 })

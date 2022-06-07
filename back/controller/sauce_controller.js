@@ -3,7 +3,6 @@ const Sauce = require("../model/sauce_model");
 exports.createSauce = (req,res)=>{
     
     const sauceValue = JSON.parse(req.body.sauce);
-    console.log(sauceValue);
 
 
     const sauce = new Sauce({
@@ -19,7 +18,6 @@ exports.createSauce = (req,res)=>{
         usersLiked: [],
         usersDisliked: []
     })
-    //console.log(sauce);
 
     sauce.save()
         .then((prod)=> res.status(201).json({message: prod}))
@@ -29,13 +27,13 @@ exports.createSauce = (req,res)=>{
 exports.getOneSauce = (req,res)=>{
 
     Sauce.findOne({_id: req.params.id})
-    .then((prod)=> res.status(201).json(prod))
+    .then((prod)=> res.status(200).json(prod))
     .catch((err)=>res.status(401).json({err}))
 }
 exports.getAllSauce = (req,res)=>{
 
     Sauce.find()
-    .then((prod)=> res.status(201).json(prod))
+    .then((prod)=> res.status(200).json(prod))
     .catch((err)=>res.status(401).json({err}))
 }
 
@@ -45,15 +43,12 @@ exports.getAllSauce = (req,res)=>{
 
 
 exports.modifySauce = (req,res)=>{
-    // Sauce.updateOne({_id: req.params.id}, {...req.body, _id: req.params.id} )
-    // .then((prod)=> res.status(200).json({message: "Sauce modifié", prod}))
-    // .catch((err)=>res.status(401).json({err}))
+    
 
-    //////////////////////
     const ProductObject = req.file ?
     {
       ...JSON.parse(req.body.sauce),
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+      imageUrl: `${req.protocol}://${req.get("host")}/images/${req.file.filename}`
     } : { ...req.body };
 
     const id = req.params.id
@@ -72,83 +67,124 @@ exports.deleteSauce = (req,res)=>{
 
 
 
-exports.likeProduct = (req,res)=> {
+exports.likeSauce = (req,res)=> {
     let like = req.body.like;
     let userId = req.body.userId;
-    const id = req.params.id;
-
-    if (like === -1 || like === 0 || like === 1){
-        if (like === 1) {
-            Sauce.findById(id)
-            .then((product)=>addLike(product, userId, res))
-            .catch((err)=> res.status(400).json({err}))
+        console.log(like);
+        console.log(userId);
+   
+   
+//         if (like === 1) {
+//             Sauce.findById(id)
+//             .then((sauces)=>addLike(sauces, userId, res))
+//             .catch((err)=> res.status(400).json({err}))
             
             
-        }else if (like === -1) {
-            Sauce.findById(id)
-            .then((product)=>disLike(product, userId, res))
-            .catch((err)=> res.status(400).json({err}))
+//         }else if (like === -1) {
+//             Sauce.findById(id)
+//             .then((sauces)=>disLike(sauces, userId, res))
+//             .catch((err)=> res.status(400).json({err}))
             
             
-        }else if (like === 0) {
-            Sauce.findById(id)
-            .then((product)=>removeLike(product, userId, res, like))
-            .catch((err)=> res.status(400).json({err}))
+//         }else if (like === 0) {
+//             Sauce.findById(id)
+//             .then((sauces)=>removeLike(sauces, userId, res, like))
+//             .catch((err)=> res.status(400).json({err}))
             
             
+//         }
+Sauce.findOne({_id: req.params.id})
+    .then((prod)=> {
+        //////////////////////////likes//////////////////////////
+        if (!prod.usersLiked.includes(req.body.userId) && req.body.like === 1) {
+            
+            Sauce.updateOne({_id: req.params.id}, {$inc: {likes: 1}, $push: {usersLiked: req.body.userId}} )
+                .then(()=>res.status(200).json({message: "user like +1"}))
+                .catch((err)=> res.status(403).json({err}))  
         }
-    } else{
-        return res.status(400).json({error: "test Request"})
-    }
-}
+        
+        if (prod.usersLiked.includes(req.body.userId) && req.body.like === 0) {
+            Sauce.updateOne({_id: req.params.id}, {$inc: {likes: -1}, $pull: {usersLiked: req.body.userId}} )
+                .then(()=>res.status(200).json({message: "user like 0"}))
+                .catch((err)=> res.status(403).json({err}))     
+        }
 
 
-function addLike(product, userId, res) {
-    const userLiked = product.usersLiked
-        if (userLiked.includes(userId)) {
-            return res.status(400).json({error: "hello Request"})
-        }else{
-            userLiked.push(userId)
-            ++product.likes;
-            product.save()
-            .then(()=> res.status(201).json({message: "produit sauvgardé"}))
-            .catch(err=> res.status(401).json({err}))
-
-            console.log(product);
-        }   
-}
-
-function disLike(product, userId, res) {
-    const userDisliked = product.usersDisliked
-        if (userDisliked.includes(userId)) {
-            return res.status(400).json({error: "edde Request"})
-        }else{
-            userDisliked.push(userId)
-            ++product.dislikes;
-            product.save()
-            .then(()=> res.status(200).json({message: "produit sauvgardé"}))
-            .catch(err=> res.status(400).json({err}))
+        /////////////////dislikes////////////////////////
+        if (!prod.usersDisliked.includes(req.body.userId) && req.body.like === -1) {
             
-            console.log(product);
-        }   
+            Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: 1}, $push: {usersDisliked: req.body.userId}} )
+                .then(()=>res.status(200).json({message: "user dislike +1"}))
+                .catch((err)=> res.status(403).json({err}))  
+        }
+        
+        if (prod.usersDisliked.includes(req.body.userId) && req.body.like === 0) {
+            Sauce.updateOne({_id: req.params.id}, {$inc: {dislikes: -1}, $pull: {usersDisliked: req.body.userId}} )
+                .then(()=>res.status(200).json({message: "user like 0"}))
+                .catch((err)=> res.status(403).json({err}))     
+        }
+        
+    })
+    .catch((err)=>res.status(404).json({err}))
 }
 
-function removeLike(product, userId, res, like) {
-    const userDisliked = product.usersDisliked
-    const userLiked = product.usersLiked
 
-    let likeUpdate = userLiked.includes(userId)? product.likes : product.dislikes
-    likeUpdate--
-    userLiked.includes(userId)? --product.likes : --product.dislikes
+// function addLike(sauces, userId, res) {
+//     const userLiked = sauces.usersLiked
+//     console.log(userLiked);
 
-    let arrUserId = userLiked.includes(userId)? product.usersDisliked : product.usersLiked;
-    let filterUserId = arrUserId.filter(user => user !== product.userId)
-    arrUserId = filterUserId
+//     let arrUserId = userLiked.includes(userId)? sauces.usersDisliked : sauces.usersLiked;
+//     console.log("----------------------------------test ArrayUserId---------------------------")
+//     console.log(arrUserId);
+
+
+
+
+
+//         if (userLiked.includes(userId)) {
+//             return res.status(400).json({error: "hello Request"})
+//         }else{
+//             userLiked.push(userId)
+//             ++sauces.likes;
+//             sauces.save()
+//             .then(()=> res.status(201).json({message: "produit sauvgardé"}))
+//             .catch(err=> res.status(401).json({err: "test 1"}))
+
+//             console.log(sauces);
+//         }   
+// }
+
+// function disLike(sauces, userId, res) {
+//     const userDisliked = sauces.usersDisliked
+//         if (userDisliked.includes(userId)) {
+//             return res.status(400).json({error: "edde Request"})
+//         }else{
+//             userDisliked.push(userId)
+//             ++sauces.dislikes;
+//             sauces.save()
+//             .then(()=> res.status(200).json({message: "produit sauvgardé"}))
+//             .catch(err=> res.status(400).json({err: "test2"}))
+            
+//             console.log(sauces);
+//         }   
+// }
+
+// function removeLike(sauces, userId, res, like) {
+//     const userDisliked = sauces.usersDisliked
+//     const userLiked = sauces.usersLiked
+
+//     let likeUpdate = userLiked.includes(userId)? sauces.likes : sauces.dislikes
+//     likeUpdate--
+//     userLiked.includes(userId)? --sauces.likes : --sauces.dislikes
+
+//     let arrUserId = userLiked.includes(userId)? sauces.usersDisliked : sauces.usersLiked;
+//     let filterUserId = arrUserId.filter(user => user !== sauces.userId)
+//     arrUserId = filterUserId
     
-    product.save()
-            .then(()=> res.status(200).json({message: "produit sauvgardé"}))
-            .catch(err=> res.status(400).json({err}))
+//     sauces.save()
+//             .then(()=> res.status(200).json({message: "produit sauvgardé"}))
+//             .catch(err=> res.status(400).json({err}))
 
-    console.log(product);
+//     console.log(sauces);
 
-}
+// }

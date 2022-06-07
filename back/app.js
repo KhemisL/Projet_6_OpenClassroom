@@ -7,8 +7,12 @@ const mongodb = require("./db/db");
 const bodyParser = require("body-parser");
 const routeUser = require("./route/user_route");
 const routeSauce = require("./route/sauce_route");
+const helmet = require("helmet");
 
-
+//sucuriter http
+app.use(helmet({
+    crossOriginResourcePolicy: false,
+  }))
 app.use(bodyParser.json())
 // logger les request et response
 app.use(morgan("dev"))
