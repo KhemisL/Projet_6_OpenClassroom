@@ -1,6 +1,6 @@
 # Projet_6_OpenClassroom
-
-# clonez le Projet avec git clone 
+    Clonez le Projet avec:
+        - git clone https://github.com/KhemisL/Projet_6_OpenClassroom.git
 
 # installer l'aplication Front-end
     Placer vous dans le dossier frontEnd avec:
