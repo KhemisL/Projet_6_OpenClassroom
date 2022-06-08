@@ -6,13 +6,24 @@
     Placez-vous dans le dossier frontEnd avec:
         - cd frontEnd
     Puis installez l'application avec:
-        - npm install
+        - npm install (S'il y a des vulnérabilités trouvées faite un ==> npm audit fix)
     Pour finir lancez l'application avec:
         - npm start
 
 # Lancement du Back-end
     Placez-vous dans le dossier back avec:
         - cd back
-    Puis lancez le serveur avec:
+    Puis installez l'application avec:
+        - npm install
+    Ensuite dans la dossier back créer un dossier images
+    Pour finir lancez le serveur avec:
         - nodemon server
+### Un message devrait apparaître dans le terminal:
+        Server listening on PORT 3000
+        Connect MongoDB succes
+
+# Lancement application 
+    http://localhost:4200/
+
+
 
