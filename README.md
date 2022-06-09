@@ -17,7 +17,7 @@
         - npm install
     Ensuite dans la dossier back créer un dossier images
     Pour finir lancez le serveur avec:
-        - npm start
+        - npm start ou nodemon start
 ### Un message devrait apparaître dans le terminal:
         Server listening on PORT 3000
         Connect MongoDB succes
